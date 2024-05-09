@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'welcome' %}">Weather App</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'current' %}">Current</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'forecast' %}">Forecast</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'precipitation' %}">Precipitation</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="searchbar">
+            <form method="post" action="{% url 'forecast' %}" class="row justify-content-center">
+                {% csrf_token %}
+                <div class="col-sm-6">
+                    <input type="text" name="city" placeholder="Enter a city to see weather forecast" class="form-control form-control-lg">
+                </div>
+                <div class="col-sm-auto">
+                    <button type="submit" class="btn btn-primary btn-lg">Search</button>
+                </div>
+            </form>
+        </div>
+    
+        {% if city_info %}
+        <div class="city-country-container">
+            <h2 class="city-country">{{ city_info.name }}, {{ city_info.country }}</h2>
+        </div>
+    {% endif %}
+
+    <div class="container my-5">
+        <div class="forecast-container mt-5">
+            {% if forecastData %}
+                {% for key, forecasts in forecastData.items %}
+                    <div class="day">
+                        <h2>{{ forecasts.0.day }}</h2>
+                        <h3>{{ forecasts.0.date }}</h3>
+                    </div>
+                    {% for forecast in forecasts %}
+                        <div class="card forecast">
+                            <div class="card-body">
+                                <h3 class="card-title card-time">{{ forecast.time }}</h3>
+                                <div>
+                                    <h1 class="card-temp-main">{{ forecast.temp }} °F</h1> 
+                                    <h4 class="card-temp-min">Low: {{ forecast.min_temp }} °F</h4>
+                                </div>
+                                <p class="card-text">{{ forecast.description }}</p>
+                                <img src="http://openweathermap.org/img/w/{{ forecast.icon }}.png" alt="{{ forecast.description }}">
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            {% else %}
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
